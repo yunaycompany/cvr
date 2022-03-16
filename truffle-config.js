@@ -15,7 +15,7 @@
  * You'll also need a mnemonic - the twelve word phrase the wallet uses to generate
  * public/private key pairs. If you're publishing your code to GitHub make sure you load this
  * phrase from a file you've .gitignored so it doesn't accidentally become public.
- *
+ * truffle migrate -f 3  --network RED
  */
 require('dotenv')
 const HDWalletProvider = require('@truffle/hdwallet-provider');
@@ -26,6 +26,7 @@ const HDWalletProvider = require('@truffle/hdwallet-provider');
 const mnemonicTestnetBSC = process.env.MNEMONIC_TESTNET_BSC
 const mnemonicMainNetBSC = process.env.MNEMONIC_MAINNET_BSC
 const bscScanApiKey = process.env.BSC_SCAN_API_KEY
+const poligonScanApiKey = process.env.POLYGON_SCAN_API_KEY
 //RSK
 const mnemonicTestnetRSK = process.env.MNEMONIC_TESTNET_RSK
 const mnemonicMainNetRSK =  process.env.MNEMONIC_MAINNET_RSK
@@ -40,6 +41,7 @@ module.exports = {
    * network from the command line, e.g
    *
    * $ truffle test --network <network-name>
+   *   truffle migrate -f 2  --network RED
    */
 
   networks: {
@@ -69,7 +71,7 @@ module.exports = {
       skipDryRun: true
     },
     testrsk: {
-      provider: () => new HDWalletProvider(mnemonicTestnetRSK, "https://public-node.testnet.rsk.co"),
+      provider: () => new HDWalletProvider(mnemonicTestnetRSK, "https://public-node.testnet.rsk.co", 0, 1, true, "m/44'/37310'/0'/0/"),
       gasPrice: 0x4C85D80,
       network_id: '31',
       skipDryRun: true
@@ -79,6 +81,21 @@ module.exports = {
       network_id: '30',
       // gasPrice: 0x4C85D80,
       //skipDryRun: true
+    },
+    matic: {
+      provider: () => new HDWalletProvider(mnemonicTestnetBSC, `https://rpc-mumbai.maticvigil.com`),
+      network_id: 80001,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      // skipDryRun: true
+    },
+    polygon: {
+      provider: () => new HDWalletProvider(mnemonicMainNetBSC, `https://polygon-rpc.com`),
+      network_id: 137,
+      confirmations: 2,
+      timeoutBlocks: 200,
+      gasPrice: 45000000000,
+      // skipDryRun: true
     },
     // Another network with more advanced options...
     // advanced: {
@@ -115,15 +132,15 @@ module.exports = {
   // Configure your compilers
   compilers: {
     solc: {
-      version: "0.8.0",    // Fetch exact version from solc-bin (default: truffle's version)
+      version: "0.8.9",    // Fetch exact version from solc-bin (default: truffle's version)
       // docker: true,        // Use "0.5.1" you've installed locally with docker (default: false)
-      // settings: {          // See the solidity docs for advice about optimization and evmVersion
-      //  optimizer: {
-      //    enabled: false,
-      //    runs: 200
-      //  },
+      settings: {          // See the solidity docs for advice about optimization and evmVersion
+       optimizer: {
+         enabled: true,
+         runs: 200
+       }
       //  evmVersion: "byzantium"
-      // }
+      }
     }
   },
 
@@ -140,6 +157,7 @@ module.exports = {
     'truffle-plugin-verify'
   ],
   api_keys: {
-    bscscan: bscScanApiKey
+    bscscan: bscScanApiKey,
+    polygonscan: poligonScanApiKey
   }
 };
